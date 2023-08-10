@@ -1,7 +1,24 @@
 export const create = (initialState) => {
-  // 이 부분을 작성합니다.
-  // 03.module-state.test.js, 04.module-state-with-react.test.jsx 모두 통과해야합니다.
-  // Hint - 구독 패턴을 이용합니다.
+  const listeners = new Set();
+  let state = initialState;
+
+  const getState = () => state;
+
+  const setState = (newState) => {
+    const nextState =
+      typeof newState === "function" ? newState(state) : newState;
+    state = Object.assign({}, state, nextState);
+
+    listeners.forEach((listener) => listener(getState()));
+  };
+
+  const subscribe = (listener) => {
+    listeners.add(listener);
+
+    return () => {
+      listeners.delete(listener);
+    };
+  };
 
   return { getState, setState, subscribe };
 };
